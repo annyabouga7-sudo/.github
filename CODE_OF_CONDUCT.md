@@ -1,133 +1,281 @@
-# Contributor Covenant Code of Conduct
 
-## Our Pledge
+import 'package:flutter/material.dart';
 
-We as members, contributors, and leaders pledge to make participation in our
-community a harassment-free experience for everyone, regardless of age, body
-size, visible or invisible disability, ethnicity, sex characteristics, gender
-identity and expression, level of experience, education, socio-economic status,
-nationality, personal appearance, race, caste, color, religion, or sexual
-identity and orientation.
+void main() {
+  runApp(NutriAfricaApp());
+}
 
-We pledge to act and interact in ways that contribute to an open, welcoming,
-diverse, inclusive, and healthy community.
+// ==================== DONNÉES ====================
+class Plat {
+  String nom;
+  String description;
+  int calories;
+  int prix;
+  String categorie;
+  Plat(this.nom, this.description, this.calories, this.prix, this.categorie);
+}
 
-## Our Standards
+class ProduitVivrier {
+  String nom;
+  String unite;
+  int prix;
+  String vendeur;
+  String imageEmoji;
+  ProduitVivrier(this.nom, this.unite, this.prix, this.vendeur, this.imageEmoji);
+}
 
-Examples of behavior that contributes to a positive environment for our
-community include:
+List<Plat> plats = [
+  Plat('Poulet grillé + Légumes', 'Pour diabétique, sans sucre', 350, 5000, 'Diabétique'),
+  Plat('Poisson braisé + Plantain', 'Riche en protéines', 420, 6000, 'Sportif'),
+  Plat('Salade Avocat + Oeuf', 'Pour perte de poids', 280, 4500, 'Minceur'),
+  Plat('Ekwang Light', 'Sans trop d\'huile, version saine', 380, 4000, 'Minceur'),
+  Plat('Ndolè Light', 'Moins d\'arachide, plus de légumes', 450, 5500, 'Diabétique'),
+];
 
-* Demonstrating empathy and kindness toward other people
-* Being respectful of differing opinions, viewpoints, and experiences
-* Giving and gracefully accepting constructive feedback
-* Accepting responsibility and apologizing to those affected by our mistakes,
-  and learning from the experience
-* Focusing on what is best not just for us as individuals, but for the overall
-  community
+List<ProduitVivrier> vivriers = [
+  ProduitVivrier('Manioc frais', '1 tas / 5kg', 2500, 'Mama Ngo - Odza', '🍠'),
+  ProduitVivrier('Plantain mûr', '1 régime', 4000, 'Ferme Biyem-Assi', '🍌'),
+  ProduitVivrier('Légumes Ndolè', '1 botte', 1000, 'Marché Mokolo', '🥬'),
+  ProduitVivrier('Riz local', 'Sac 5kg', 6500, 'Coopérative Nord', '🍚'),
+  ProduitVivrier('Huile de palme', 'Bidon 5L', 8000, 'Ferme Douala', '🫙'),
+  ProduitVivrier('Haricot rouge', 'Seau 5kg', 7000, 'Ferme Bafoussam', '🫘'),
+  ProduitVivrier('Igname', '1 tubercule', 3500, 'Mama Ngo - Odza', '🍠'),
+  ProduitVivrier('Tomates fraîches', '1 cageot', 3000, 'Marché Mokolo', '🍅'),
+  ProduitVivrier('Oeufs frais', 'Plaquette 30', 3000, 'Ferme Yaoundé', '🥚'),
+  ProduitVivrier('Miel pur', 'Pot 1L', 10000, 'Coopérative Ouest', '🍯'),
+];
 
-Examples of unacceptable behavior include:
+List<Map<String, dynamic>> panier = [];
 
-* The use of sexualized language or imagery, and sexual attention or advances of
-  any kind
-* Trolling, insulting or derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or email address,
-  without their explicit permission
-* Other conduct which could reasonably be considered inappropriate in a
-  professional setting
+// ==================== APP PRINCIPALE ====================
+class NutriAfricaApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'NUTRI-AFRICA',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.green, useMaterial3: true),
+      home: PagePrincipale(),
+    );
+  }
+}
 
-## Enforcement Responsibilities
+class PagePrincipale extends StatefulWidget {
+  @override
+  _PagePrincipaleState createState() => _PagePrincipaleState();
+}
 
-* Community leaders are responsible for clarifying and enforcing our standards of
-  acceptable behavior and will take appropriate and fair corrective action in
-  response to any behavior that they deem inappropriate, threatening, offensive,
-  or harmful.
+class _PagePrincipaleState extends State<PagePrincipale> {
+  int _index = 0;
+  final pages = [AccueilPage(), MarcheVivrierPage(), ProfilSantePage(), PanierPage()];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: pages[_index],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _index,
+        onTap: (i) => setState(() => _index = i),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.green,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
+          BottomNavigationBarItem(icon: Icon(Icons.store), label: 'Marché Vivrier'),
+          BottomNavigationBarItem(icon: Icon(Icons.monitor_weight), label: 'Ma Santé'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Panier (${panier.length})'),
+        ],
+      ),
+    );
+  }
+}
 
-* Community leaders have the right and responsibility to remove, edit, or reject
-  comments, commits, code, wiki edits, issues, and other contributions that are
-  not aligned to this Code of Conduct, and will communicate reasons for moderation
-  decisions when appropriate.
+// ==================== 1. ACCUEIL ====================
+class AccueilPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('NUTRI-AFRICA'), centerTitle: true, backgroundColor: Colors.green),
+      body: ListView(
+        padding: EdgeInsets.all(16),
+        children: [
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(color: Colors.green[50], borderRadius: BorderRadius.circular(12)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Mange sain, vis mieux', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              Text('Partout en Afrique. Yaoundé - Douala - Dakar - Abidjan'),
+              SizedBox(height: 10),
+              ElevatedButton(onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => ConsultationPage()));
+              }, child: Text('Consulter un Nutritionniste - 5 000 FCFA')),
+            ]),
+          ),
+          SizedBox(height: 16),
+          Text('NOS REPAS SAINS DU JOUR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          SizedBox(height: 8),
+          ...plats.map((p) => Card(
+            child: ListTile(
+              leading: CircleAvatar(child: Text('🍽️')),
+              title: Text(p.nom),
+              subtitle: Text('${p.description} - ${p.calories} kcal - ${p.categorie}'),
+              trailing: Text('${p.prix} F', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+              onTap: () {
+                panier.add({'nom': p.nom, 'prix': p.prix, 'type': 'Repas'});
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${p.nom} ajouté au panier')));
+              },
+            ),
+          )).toList(),
+          SizedBox(height: 16),
+          Text('MARCHÉ VIVRIER - PRODUITS FRAIS', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          SizedBox(height: 8),
+          Container(
+            padding: EdgeInsets.all(12),
+            color: Colors.orange[50],
+            child: Text('Achetez directement chez les agriculteurs du Cameroun. Livraison en 60 min. Manioc, Plantain, Légumes, Riz...'),
+          ),
+          ElevatedButton(onPressed: () {
+            // Aller au marché
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Clique en bas sur Marché Vivrier')));
+          }, child: Text('VOIR LE MARCHÉ VIVRIER')),
+        ],
+      ),
+    );
+  }
+}
 
-## Scope
+// ==================== 2. MARCHÉ VIVRIER - NOUVEAU ====================
+class MarcheVivrierPage extends StatefulWidget {
+  @override
+  _MarcheVivrierPageState createState() => _MarcheVivrierPageState();
+}
 
-* This Code of Conduct applies within all community spaces, and also applies when
-  an individual is officially representing the community in public spaces.
-  Examples of representing our community include using an official e-mail address,
-  posting via an official social media account, or acting as an appointed
-  representative at an online or offline event.
+class _MarcheVivrierPageState extends State<MarcheVivrierPage> {
+  String filtre = 'Tous';
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Marché Vivrier'), backgroundColor: Colors.orange),
+      body: Column(
+        children: [
+          Padding(padding: EdgeInsets.all(12), child: TextField(decoration: InputDecoration(hintText: 'Rechercher manioc, plantain, riz...', prefixIcon: Icon(Icons.search), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))))),
+          SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: ['Tous', 'Tubercules', 'Légumes', 'Céréales', 'Autres'].map((c) => Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: ChoiceChip(label: Text(c), selected: filtre == c, onSelected: (_) => setState(() => filtre = c)))).toList())),
+          Expanded(child: ListView.builder(itemCount: vivriers.length, itemBuilder: (context, i) {
+            var v = vivriers[i];
+            return Card(margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6), child: ListTile(
+              leading: Text(v.imageEmoji, style: TextStyle(fontSize: 30)),
+              title: Text(v.nom, style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text('${v.unite} - Vendeur: ${v.vendeur}\nLivraison: Yaoundé, Douala, Bafoussam'),
+              isThreeLine: true,
+              trailing: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text('${v.prix} FCFA', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                SizedBox(height: 4),
+                ElevatedButton(onPressed: () { setState(() { panier.add({'nom': v.nom, 'prix': v.prix, 'type': 'Vivrier'}); }); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${v.nom} ajouté'))); }, child: Text('Acheter')),
+              ]),
+            ));
+          })),
+        ],
+      ),
+    );
+  }
+}
 
-## Enforcement
+// ==================== 3. PROFIL SANTÉ + IMC ====================
+class ProfilSantePage extends StatefulWidget {
+  @override
+  _ProfilSantePageState createState() => _ProfilSantePageState();
+}
 
-* Instances of abusive, harassing, or otherwise unacceptable behavior may be
-  reported to the community leaders responsible for enforcement at
-  support@github.com.
- 
-* All complaints will be reviewed and investigated promptly and fairly.
+class _ProfilSantePageState extends State<ProfilSantePage> {
+  TextEditingController poidsCtrl = TextEditingController(text: '70');
+  TextEditingController tailleCtrl = TextEditingController(text: '1.65');
+  double imc = 0;
+  String resultat = '';
+  String objectif = 'Perte de poids';
 
-* All community leaders are obligated to respect the privacy and security of the
-  reporter of any incident.
+  void calculerIMC() {
+    double poids = double.tryParse(poidsCtrl.text) ?? 0;
+    double taille = double.tryParse(tailleCtrl.text) ?? 1;
+    setState(() {
+      imc = poids / (taille * taille);
+      if (imc < 18.5) resultat = 'Sous-poids - Tu dois manger plus';
+      else if (imc < 25) resultat = 'Poids normal - Bravo ! Continue';
+      else if (imc < 30) resultat = 'Surpoids - Plan Minceur recommandé';
+      else resultat = 'Obésité - Consulte un nutritionniste vite';
+    });
+  }
 
-## Enforcement Guidelines
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Ma Santé - IMC'), backgroundColor: Colors.green),
+      body: Padding(padding: EdgeInsets.all(16), child: ListView(children: [
+        Text('Ton Profil Santé', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        SizedBox(height: 12),
+        TextField(controller: poidsCtrl, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: 'Poids en kg (ex: 70)', border: OutlineInputBorder())),
+        SizedBox(height: 12),
+        TextField(controller: tailleCtrl, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: 'Taille en mètre (ex: 1.65)', border: OutlineInputBorder())),
+        SizedBox(height: 12),
+        DropdownButtonFormField<String>(value: objectif, items: ['Perte de poids', 'Diabétique', 'Sportif', 'Femme enceinte', 'Prise de masse'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) => setState(() => objectif = v!), decoration: InputDecoration(labelText: 'Ton objectif', border: OutlineInputBorder())),
+        SizedBox(height: 16),
+        ElevatedButton(onPressed: calculerIMC, child: Text('CALCULER MON IMC')),
+        SizedBox(height: 16),
+        if (imc > 0) Container(padding: EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.green[50], borderRadius: BorderRadius.circular(12)), child: Column(children: [
+          Text('Ton IMC : ${imc.toStringAsFixed(1)}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          Text(resultat, textAlign: TextAlign.center),
+          SizedBox(height: 8),
+          Text('Objectif: $objectif'),
+          SizedBox(height: 8),
+          Text('Plan recommandé: 7 jours de repas sains + 1 consultation'),
+        ])),
+        SizedBox(height: 16),
+        Text('Tes Nutritionnistes', style: TextStyle(fontWeight: FontWeight.bold)),
+        ListTile(leading: CircleAvatar(child: Text('Dr')), title: Text('Dr. Ngo Bell - Nutritionniste'), subtitle: Text('Yaoundé - 10 ans d\'expérience - Diplôme vérifié'), trailing: Icon(Icons.verified, color: Colors.blue)),
+        ListTile(leading: CircleAvatar(child: Text('Dr')), title: Text('Dr. Kamga - Diététicien'), subtitle: Text('Douala - Spécialiste diabète'), trailing: Icon(Icons.verified, color: Colors.blue)),
+      ])),
+    );
+  }
+}
 
-* Community leaders will follow these Community Impact Guidelines in determining
-  the consequences for any action they deem in violation of this Code of Conduct:
+// ==================== 4. CONSULTATION ====================
+class ConsultationPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(appBar: AppBar(title: Text('Consultation')), body: Padding(padding: EdgeInsets.all(16), child: Column(children: [
+      Text('Choisis ton nutritionniste', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      Card(child: ListTile(title: Text('Dr. Ngo Bell'), subtitle: Text('Disponible aujourd\'hui à 15h - Vidéo 30 min'), trailing: Text('5 000 FCFA'))),
+      Card(child: ListTile(title: Text('Dr. Kamga'), subtitle: Text('Disponible demain à 10h - Chat'), trailing: Text('5 000 FCFA'))),
+      SizedBox(height: 20),
+      TextField(decoration: InputDecoration(hintText: 'Décris ton problème : Je veux maigrir, je suis diabétique...', border: OutlineInputBorder()), maxLines: 3),
+      SizedBox(height: 16),
+      ElevatedButton(onPressed: () { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Demande envoyée au nutritionniste. Réponse en moins de 24h.'))); }, child: Text('ENVOYER MA DEMANDE')),
+    ])));
+  }
+}
 
-### 1. Correction
+// ==================== 5. PANIER + PAIEMENT ====================
+class PanierPage extends StatefulWidget {
+  @override
+  _PanierPageState createState() => _PanierPageState();
+}
 
-**Community Impact**: Use of inappropriate language or other behavior deemed
-unprofessional or unwelcome in the community.
-
-**Consequence**: A private, written warning from community leaders, providing
-clarity around the nature of the violation and an explanation of why the
-behavior was inappropriate. A public apology may be requested.
-
-### 2. Warning
-
-**Community Impact**: A violation through a single incident or series of
-actions.
-
-**Consequence**: A warning with consequences for continued behavior. No
-interaction with the people involved, including unsolicited interaction with
-those enforcing the Code of Conduct, for a specified period of time. This
-includes avoiding interactions in community spaces as well as external channels
-like social media. Violating these terms may lead to a temporary or permanent
-ban.
-
-### 3. Temporary Ban
-
-**Community Impact**: A serious violation of community standards, including
-sustained inappropriate behavior.
-
-**Consequence**: A temporary ban from any sort of interaction or public
-communication with the community for a specified period of time. No public or
-private interaction with the people involved, including unsolicited interaction
-with those enforcing the Code of Conduct, is allowed during this period.
-Violating these terms may lead to a permanent ban.
-
-### 4. Permanent Ban
-
-**Community Impact**: Demonstrating a pattern of violation of community
-standards, including sustained inappropriate behavior, harassment of an
-individual, or aggression toward or disparagement of classes of individuals.
-
-**Consequence**: A permanent ban from any sort of public interaction within the
-community.
-
-## Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant][homepage],
-version 2.1, available at
-[https://www.contributor-covenant.org/version/2/1/code_of_conduct.html][v2.1].
-
-Community Impact Guidelines were inspired by
-[Mozilla's code of conduct enforcement ladder][Mozilla CoC].
-
-For answers to common questions about this code of conduct, see the FAQ at
-[https://www.contributor-covenant.org/faq][FAQ]. Translations are available at
-[https://www.contributor-covenant.org/translations][translations].
-
-[homepage]: https://www.contributor-covenant.org
-[v2.1]: https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
-[Mozilla CoC]: https://github.com/mozilla/diversity
-[FAQ]: https://www.contributor-covenant.org/faq
-[translations]: https://www.contributor-covenant.org/translations
+class _PanierPageState extends State<PanierPage> {
+  String paiement = 'MTN MoMo';
+  int get total => panier.fold(0, (sum, item) => sum + (item['prix'] as int));
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(appBar: AppBar(title: Text('Mon Panier'), backgroundColor: Colors.green), body: Column(children: [
+      Expanded(child: panier.isEmpty ? Center(child: Text('Ton panier est vide.\nVa dans Accueil ou Marché Vivrier pour acheter.', textAlign: TextAlign.center)) : ListView.builder(itemCount: panier.length, itemBuilder: (context, i) {
+        return ListTile(leading: Icon(panier[i]['type'] == 'Vivrier' ? Icons.store : Icons.restaurant), title: Text(panier[i]['nom']), subtitle: Text(panier[i]['type']), trailing: Text('${panier[i]['prix']} FCFA'));
+      })),
+      Container(padding: EdgeInsets.all(16), child: Column(children: [
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Total :', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)), Text('$total FCFA', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green))]),
+        SizedBox(height: 10),
+        DropdownButtonFormField<String>(value: paiement, items: ['MTN MoMo', 'Orange Money', 'Wave', 'Espèces à la livraison'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(), onChanged: (v) => setState(() => paiement = v!), decoration: InputDecoration(labelText: 'Mode de paiement', border: OutlineInputBorder())),
+        SizedBox(height: 12),
+        SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () {
+          if (panier.isEmpty) return;
+          showDialog(context: context, builder: (_) => AlertDialog(title: Text('Commande confirmée !'), content: Text('Merci ! Tu as payé $total FCFA avec $paiement.\nTon livreur arrive en 60 min à Yaoundé.\nTu peux suivre ta livraison en temps réel.'), actions: [TextButton(onPressed: () { setState(() { panier.clear(); }); Navigator.pop(context); }, child: Text('OK'))]));
+        }, child: Text('PAYER $total FCFA - $paiement'))),
+      ])),
+    ]));
+  }
+}
